@@ -19,6 +19,9 @@ void LED_Init(void)
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 	// GPIO初始化
 	GPIO_Init(LED_Port, &GPIO_InitStructure);
+	
+	// 设置LED控制引脚为高电平，即LED默认灭灯
+	GPIO_SetBits(LED_Port, LED_Pin);
 }
 
 /**
@@ -28,7 +31,7 @@ void LED_Init(void)
  */
 void LED_ON(void)
 {
-	// 设置LED_Pin引脚为低电平
+	// 设置LED控制引脚为低电平
 	GPIO_ResetBits(LED_Port, LED_Pin);
 }
 
@@ -39,7 +42,7 @@ void LED_ON(void)
  */
 void LED_OFF(void)
 {
-	// 设置LED_Pin引脚为高电平
+	// 设置LED控制引脚为高电平
 	GPIO_SetBits(LED_Port, LED_Pin);
 }
 
@@ -66,22 +69,4 @@ void LED_ON_OFF(void)
 	LED_OFF();
 	// 延时100ms
 	Delay_ms(100);
-}
-
-/**
- * 函数：LED状态翻转
- * 参数：无
- * 返回值：无
- */
-void LED_Turn(void) {
-	// 获取GPIO端口B输出寄存器的状态，如果当前引脚输出低电平
-	if (GPIO_ReadOutputDataBit(LED_Port, LED_Pin) == 0) {
-		// 则设置LED引脚为高电平，灭灯
-		LED_OFF();
-	}
-	else {
-		// 否则，即当前引脚输出高电平
-		// 则LED引脚为低电平，亮灯
-		LED_ON();
-	}
 }

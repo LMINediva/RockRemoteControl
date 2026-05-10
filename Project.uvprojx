@@ -618,6 +618,16 @@
               <FileType>5</FileType>
               <FilePath>.\User\BSP\Struct_All.h</FilePath>
             </File>
+            <File>
+              <FileName>Buzzer.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\User\BSP\Buzzer.h</FilePath>
+            </File>
+            <File>
+              <FileName>Buzzer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\User\BSP\Buzzer.c</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>

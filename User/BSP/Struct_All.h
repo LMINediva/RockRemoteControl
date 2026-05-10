@@ -5,5 +5,6 @@
 #include "Delay.h"
 #include "LED.h"
 #include "Key.h"
+#include "Buzzer.h"
 
 #endif
