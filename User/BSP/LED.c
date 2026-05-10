@@ -11,7 +11,7 @@ void LED_Init(void)
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
 	
 	GPIO_InitTypeDef GPIO_InitStructure;
-	// 推挽输出模式
+	// 推挽输出模式（Push Pull Output）
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
 	// LED：电源旁的指示灯
 	GPIO_InitStructure.GPIO_Pin = LED_Pin;
@@ -44,7 +44,7 @@ void LED_OFF(void)
 }
 
 /**
-* 函数：LED开机闪烁
+ * 函数：LED开机闪烁
  * 参数：无
  * 返回值：无
  */
@@ -66,4 +66,22 @@ void LED_ON_OFF(void)
 	LED_OFF();
 	// 延时100ms
 	Delay_ms(100);
+}
+
+/**
+ * 函数：LED状态翻转
+ * 参数：无
+ * 返回值：无
+ */
+void LED_Turn(void) {
+	// 获取GPIO端口B输出寄存器的状态，如果当前引脚输出低电平
+	if (GPIO_ReadOutputDataBit(LED_Port, LED_Pin) == 0) {
+		// 则设置LED引脚为高电平，灭灯
+		LED_OFF();
+	}
+	else {
+		// 否则，即当前引脚输出高电平
+		// 则LED引脚为低电平，亮灯
+		LED_ON();
+	}
 }
