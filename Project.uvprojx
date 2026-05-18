@@ -564,6 +564,18 @@
         </Group>
         <Group>
           <GroupName>User_APP</GroupName>
+          <Files>
+            <File>
+              <FileName>Tasks.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\User\APP\Tasks.c</FilePath>
+            </File>
+            <File>
+              <FileName>Tasks.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\User\APP\Tasks.h</FilePath>
+            </File>
+          </Files>
         </Group>
         <Group>
           <GroupName>User_BSP</GroupName>
@@ -627,6 +639,16 @@
               <FileName>Buzzer.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\User\BSP\Buzzer.c</FilePath>
+            </File>
+            <File>
+              <FileName>Timer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\User\BSP\Timer.c</FilePath>
+            </File>
+            <File>
+              <FileName>Timer.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\User\BSP\Timer.h</FilePath>
             </File>
           </Files>
         </Group>

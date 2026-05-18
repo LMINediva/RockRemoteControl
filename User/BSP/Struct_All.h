@@ -6,5 +6,6 @@
 #include "LED.h"
 #include "Key.h"
 #include "Buzzer.h"
+#include "Timer.h"
 
 #endif
