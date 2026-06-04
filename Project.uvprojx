@@ -650,6 +650,16 @@
               <FileType>5</FileType>
               <FilePath>.\User\BSP\Timer.h</FilePath>
             </File>
+            <File>
+              <FileName>DMA_ADC.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\User\BSP\DMA_ADC.h</FilePath>
+            </File>
+            <File>
+              <FileName>DMA_ADC.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\User\BSP\DMA_ADC.c</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>

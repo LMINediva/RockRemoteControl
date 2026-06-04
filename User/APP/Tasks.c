@@ -1,8 +1,8 @@
-#include "stm32f10x.h"                  // Device header
-#include "LED.h"
-#include "Buzzer.h"
 #include "Timer.h"
 #include "Tasks.h"
+#include "DMA_ADC.h"
+#include "LED.h"
+#include "Buzzer.h"
 
 // 板级支持包中的硬件驱动是否初始化完成标志
 uint8_t BSP_Init_OK = 0;
@@ -53,6 +53,8 @@ void BSP_Init(void)
 	Timer3_Init(500);
 	// NVIC初始化
 	My_NVIC_Init();
+	// ADC及DMA初始化
+	ADC1_Init();
 	
 	BSP_Init_OK = 1;
 }

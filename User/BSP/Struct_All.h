@@ -3,9 +3,10 @@
 #include "stm32f10x.h"                  // Device header
 
 #include "Delay.h"
+#include "Timer.h"
+#include "DMA_ADC.h"
 #include "LED.h"
 #include "Key.h"
 #include "Buzzer.h"
-#include "Timer.h"
 
 #endif
