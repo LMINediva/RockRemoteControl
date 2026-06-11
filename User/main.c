@@ -2,10 +2,16 @@
 #include "Tasks.h"
 #include "OLED.h"
 #include "Delay.h"
+#include "Key.h"
 
 // volatile uint16_t Num_2ms, Num_10ms, Num_40ms, Num_250ms;
 
-volatile uint16_t Battery_RC;
+// 定义用于接收按键键码的变量
+uint8_t KeyNum;
+// 按下次数记录
+uint8_t PressNum = 0;
+// 定义用于接收串口数据的变量
+uint8_t RxData;
 
 int main(void)
 {	
@@ -13,37 +19,84 @@ int main(void)
 	OLED_Init();
 	// 板级支持包中的硬件驱动初始化
 	BSP_Init();
+	// 按键初始化
+	Key_Init();
 	
 	/* 显示静态字符串 */
-	OLED_ShowString(4, 1, "Battery:");
+	OLED_ShowString(1, 1, "Rx:");
+	OLED_ShowString(2, 1, "Tx:");
+	OLED_ShowString(3, 1, "Press:");
 	
 	while (1)
 	{
-		// 自转微调电位器
-		OLED_ShowNum(1, 1, ADC_Value[0], 4);
-		// 前后微调电位器
-		OLED_ShowNum(1, 6, ADC_Value[1], 4);
-		// 左右微调电位器
-		OLED_ShowNum(1, 11, ADC_Value[2], 4);
-		// 3.7V锂电池电压
-		OLED_ShowNum(2, 1, ADC_Value[3], 4);
-		// 左摇杆的Y轴（上下），油门（THROTTLE）
-		OLED_ShowNum(2, 6, ADC_Value[4], 4);
-		// 左摇杆的X轴（左右），偏航角（YAW）
-		OLED_ShowNum(2, 11, ADC_Value[5], 4);
-		// 右摇杆的Y轴（上下），俯仰角（PITCH）
-		OLED_ShowNum(3, 1, ADC_Value[6], 4);
-		// 右摇杆的X轴（左右），翻滚角（ROLL）
-		OLED_ShowNum(3, 6, ADC_Value[7], 4);
-		// 内部参考电压（1.2V）
-		OLED_ShowNum(3, 11, ADC_Value[8], 4);
+		// 获取按键键码
+		KeyNum = Key_GetNum();
 		
-		// 电池电压的100倍：(uint16_t)(2.0f * ADC_Value[3] / ADC_Value[8] * 1.2f * 100)
-		Battery_RC = (uint16_t)(2.0f * ADC_Value[3] / ADC_Value[8] * 1.2f * 100);
-		OLED_ShowNum(4, 9, Battery_RC, 4);
+		// 串口接收
+		// 检查串口接收数据的标志位
+		if (Serial_GetRxFlag() == 1)
+		{
+			// 获取串口接收的数据
+			RxData = Serial_GetRxData();
+			// 显示串口接收的数据
+			OLED_ShowHexNum(1, 4, RxData, 2);
+		}
 		
-		// 延时100ms，手动增加一些转换的间隔时间
-		Delay_ms(100);
+		// 串口发送
+		if (KeyNum == 1)
+		{
+			PressNum++;
+			// 显示按键次数
+			OLED_ShowNum(3, 7, PressNum, 2);
+			// 根据按下次数的不同，测试自定义串口函数
+			switch (PressNum)
+			{
+				case 1:
+					// 串口以HEX的形式输出U8（无符号8位整数）型数据
+					PrintHexU8(0x11);
+					// 显示串口发送的数据
+					OLED_ShowHexNum(2, 4, 0x11, 2);
+				break;
+				case 2:
+					// 串口以HEX的形式输出S16（有符号16位整数）型数据
+					PrintHexS16(0x2222);
+					// 显示串口发送的数据
+					OLED_ShowHexNum(2, 4, 0x2222, 4);
+				break;
+				case 3:
+					// 串口以字符的形式输出S8（有符号8位整数）型数据
+					PrintS8(100);
+					// 显示串口发送的数据
+					OLED_ShowNum(2, 4, 100, 3);
+				break;
+				case 4:
+					// 串口以字符的形式输出U8（无符号8位整数）型数据
+					PrintU8(200);
+					// 显示串口发送的数据
+					OLED_ShowNum(2, 4, 200, 3);
+				break;
+				case 5:
+					// 串口以字符的形式输出S16（有符号16位整数）型数据
+					PrintS16(30000);
+					// 显示串口发送的数据
+					OLED_ShowNum(2, 4, 30000, 5);
+				break;
+				case 6:
+					// 串口以字符的形式输出U16型数据
+					PrintU16(60000);
+					// 显示串口发送的数据
+					OLED_ShowNum(2, 4, 60000, 5);
+				break;
+				case 7:
+					// 串口输出字符串
+					PrintString("aaa");
+					// 显示串口发送的数据
+					OLED_ShowString(2, 4, "aaa");
+				break;
+				default:
+					break;
+			}
+		}
 		
 		/**
 		if (Count_2ms >= 1)

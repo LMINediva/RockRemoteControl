@@ -1,6 +1,7 @@
 #include "Timer.h"
 #include "Tasks.h"
 #include "DMA_ADC.h"
+#include "Uart.h"
 #include "LED.h"
 #include "Buzzer.h"
 
@@ -34,6 +35,17 @@ void My_NVIC_Init(void)
 	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;
 	// 将结构体变量交给NVIC_Init，配置NVIC外设
 	NVIC_Init(&NVIC_InitStructure);
+	
+	// 串口，选择配置NVIC的USART1线
+	NVIC_InitStructure.NVIC_IRQChannel = USART1_IRQn;
+	// 指定NVIC线路使能
+	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+	// 指定NVIC线路的抢占优先级为2
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 2;
+	// 指定NVIC线路的响应优先级为0
+	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+	// 将结构体变量交给NVIC_Init，配置NVIC外设
+	NVIC_Init(&NVIC_InitStructure);
 }
 
 /**
@@ -49,6 +61,8 @@ void BSP_Init(void)
 	Buzzer_Init();
 	// LED闪烁
 	LED_ON_OFF();
+	// 串口初始化，波特率：115200，8位数据，1位停止位，禁用奇偶校验
+	Uart1_Init(115200);
 	// Timer3初始化，频率为：500HZ
 	Timer3_Init(500);
 	// NVIC初始化

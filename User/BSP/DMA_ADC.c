@@ -53,13 +53,13 @@ static void ADC1_Mode_Config(void)
 	/* 规则组通道配置 */
 	// 规则组序列1~8的位置分别配置为通道0~7，序列9的位置配置为通道17，
 	// 普通采样时间为71.5个周期
-	// 自转微调电位器
+	// 自转微调电位器，AUX2
 	ADC_RegularChannelConfig(ADC1, ADC_Channel_0, 1, ADC_SampleTime_71Cycles5);
-	// 前后微调电位器
+	// 前后微调电位器，AUX3
 	ADC_RegularChannelConfig(ADC1, ADC_Channel_1, 2, ADC_SampleTime_71Cycles5);
-	// 左右微调电位器
+	// 左右微调电位器，AUX1
 	ADC_RegularChannelConfig(ADC1, ADC_Channel_2, 3, ADC_SampleTime_71Cycles5);
-	// 3.7V锂电池电压
+	// 3.7V锂电池电压，AUX4
 	ADC_RegularChannelConfig(ADC1, ADC_Channel_3, 4, ADC_SampleTime_239Cycles5);
 	// 左摇杆的Y轴（上下），油门（THROTTLE）
 	ADC_RegularChannelConfig(ADC1, ADC_Channel_4, 5, ADC_SampleTime_71Cycles5);
@@ -67,7 +67,7 @@ static void ADC1_Mode_Config(void)
 	ADC_RegularChannelConfig(ADC1, ADC_Channel_5, 6, ADC_SampleTime_71Cycles5);
 	// 右摇杆的Y轴（上下），俯仰角（PITCH）
 	ADC_RegularChannelConfig(ADC1, ADC_Channel_6, 7, ADC_SampleTime_71Cycles5);
-	// 右摇杆的X轴（左右），翻滚角（ROLL）
+	// 右摇杆的X轴（左右），横滚角（ROLL）
 	ADC_RegularChannelConfig(ADC1, ADC_Channel_7, 8, ADC_SampleTime_71Cycles5);
 	// 内部参考电压（1.2V）
 	ADC_RegularChannelConfig(ADC1, ADC_Channel_17, 9, ADC_SampleTime_239Cycles5);
