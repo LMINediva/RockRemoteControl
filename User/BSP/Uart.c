@@ -67,14 +67,14 @@ void Uart1_Init(uint32_t baud)
 }
 
 /**
- * 函数：串口以HEX的形式输出U8（无符号8位整数）型数据
- * 参数：data 要发送的一个U8型数据，范围：0~255
+ * 函数：串口发送一个字节
+ * 参数：Byte 要发送的一个字节
  * 返回值：无
  */
-void PrintHexU8(uint8_t data)
+void Serial_SendByte(uint8_t Byte)
 {
 	// 将字节数据写入数据寄存器，写入后USART自动生成时序波形
-	USART_SendData(USART1, data);
+	USART_SendData(USART1, Byte);
 	
 	// 等待发送完成
 	// 下次写入数据寄存器会自动清除发送完成标志位，故此循环后，无需清除标志位
@@ -82,124 +82,86 @@ void PrintHexU8(uint8_t data)
 }
 
 /**
- * 函数：串口以HEX的形式输出S16（有符号16位整数）型数据
- * 参数：num 要发送的一个S16型数据，范围：-32768 ~ 32767
+ * 函数：串口发送一个数组
+ * 参数：Array 要发送数组的首地址
+ * 参数：Length 要发送数组的长度
  * 返回值：无
  */
-void PrintHexS16(int16_t num)
+void Serial_SendArray(uint8_t *Array, uint16_t Length)
 {
-	// 先发送高8位，再发送低8位
-	PrintHexU8((uint8_t)((num & 0xFF00) >> 8));
-	PrintHexU8((uint8_t)(num & 0x00FF));
-}
-
-/**
- * 函数：串口以字符的形式输出S8（有符号8位整数）型数据
- * 参数：num 要发送的一个以字符的形式的S8型数据，范围：-128 ~ 127
- * 返回值：无
- */
-void PrintS8(int8_t num)
-{
-	// 百位、十位和个位
-	uint8_t hundred, ten, one;
-	if (num < 0)
+	uint16_t i;
+	// 遍历数组
+	for (i = 0; i < Length; i++)
 	{
-		PrintHexU8('-');
-		num = -num;
+		// 依次调用Serial_SendByte发送每个字节数据
+		Serial_SendByte(Array[i]);
 	}
-	else
-	{
-		PrintHexU8(' ');
-	}
-	hundred = num / 100;
-	ten = num % 100 / 10;
-	one = num % 10;
-	PrintHexU8('0' + hundred);
-	PrintHexU8('0' + ten);
-	PrintHexU8('0' + one);
 }
 
 /**
- * 函数：串口以字符的形式输出U8（无符号8位整数）型数据
- * 参数：num 要发送的一个以字符的形式的U8型数据，范围：0~255
+ * 函数：串口发送一个字符串
+ * 参数：String 要发送字符串的首地址
  * 返回值：无
  */
-void PrintU8(uint8_t num)
-{
-	// 百位、十位和个位
-	uint8_t hundred, ten, one;
-	hundred = num / 100;
-	ten = num % 100 / 10;
-	one = num % 10;
-	PrintHexU8('0' + hundred);
-	PrintHexU8('0' + ten);
-	PrintHexU8('0' + one);
-}
-
-/**
- * 函数：串口以字符的形式输出S16（有符号16位整数）型数据
- * 参数：num 要发送的一个以字符的形式的S16型数据，范围：-32768 ~ 32767
- * 返回值：无
- */
-void PrintS16(int16_t num)
-{
-	uint8_t w5, w4, w3, w2, w1;
-	if (num < 0)
-	{
-		PrintHexU8('-');
-		num = -num;
-	}
-	else
-	{
-		PrintHexU8(' ');
-	}
-	w5 = num % 100000 / 10000;
-	w4 = num % 10000 / 1000;
-	w3 = num % 1000 / 100;
-	w2 = num % 100 / 10;
-	w1 = num % 10;
-	PrintHexU8('0' + w5);
-	PrintHexU8('0' + w4);
-	PrintHexU8('0' + w3);
-	PrintHexU8('0' + w2);
-	PrintHexU8('0' + w1);
-}
-
-/**
- * 函数：串口以字符的形式输出U16型数据
- * 参数：num 要发送的一个以字符的形式的U16型数据，范围：0 ~ 65535
- * 返回值：无
- */
-void PrintU16(uint16_t num)
-{
-	uint8_t w5, w4, w3, w2, w1;
-	w5 = num % 100000 / 10000;
-	w4 = num % 10000 / 1000;
-	w3 = num % 1000 / 100;
-	w2 = num % 100 / 10;
-	w1 = num % 10;
-	PrintHexU8(' ');
-	PrintHexU8('0' + w5);
-	PrintHexU8('0' + w4);
-	PrintHexU8('0' + w3);
-	PrintHexU8('0' + w2);
-	PrintHexU8('0' + w1);
-}
-
-/**
- * 函数：串口输出字符串
- * 参数：s 要发送的字符串
- * 返回值：无
- */
-void PrintString(char *s)
+void Serial_SendString(char *String)
 {
 	uint8_t i;
 	// 遍历字符数组（字符串），遇到字符串结束标志位后停止
-	for (i = 0; s[i] != '\0'; i++)
+	for (i = 0; String[i] != '\0'; i++)
 	{
-		// 依次调用PrintHexU8发送每个字节数据
-		PrintHexU8(s[i]);
+		// 依次调用Serial_SendByte发送每个字节数据
+		Serial_SendByte(String[i]);
 	}
+}
+
+/**
+ * 函数：次方函数（内部使用）
+ * 返回值：返回值等于X的Y次方
+ */
+static uint32_t Serial_Pow(uint32_t X, uint32_t Y)
+{
+	// 设置结果初值为1
+	uint32_t Result = 1;
+	// 执行Y次
+	while (Y--)
+	{
+		// 将X累乘到结果
+		Result *= X;
+	}
+	return Result;
+}
+
+/**
+ * 函数：串口发送数字
+ * 参数：Number 要发送的数字，范围：0~4294967295
+ * 参数：Length 要发送数字的长度，范围：0~10
+ * 返回值：无
+ */
+void Serial_SendNumber(uint32_t Number, uint8_t Length)
+{
+	uint8_t i;
+	// 根据数字长度遍历数字的每一位
+	for (i = 0; i < Length; i++)
+	{
+		// 依次调用Serial_SendByte发送每位数字
+		Serial_SendByte(Number / Serial_Pow(10, Length - i - 1) % 10 + '0');
+	}
+}
+
+/**
+ * 函数：单个字节转两个 ASCII 字符 (例如 0xAB -> "AB")，并通过串口发送
+ * 参数：Data 要发送的十六进制数
+ * 返回值：无
+ */
+void Serial_SendHexAsText(uint8_t Data) {
+    char hexStr[3];
+    const char hexChars[] = "0123456789ABCDEF";
+	// 高 4 位
+    hexStr[0] = hexChars[(Data >> 4) & 0x0F];
+	// 低 4 位
+    hexStr[1] = hexChars[Data & 0x0F];
+    hexStr[2] = '\0';
+	Serial_SendString(hexStr);
 }
 
 /**

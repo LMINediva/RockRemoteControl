@@ -1,101 +1,142 @@
 #include "Struct_All.h"
 #include "Tasks.h"
-#include "OLED.h"
-#include "Delay.h"
-#include "Key.h"
 
 // volatile uint16_t Num_2ms, Num_10ms, Num_40ms, Num_250ms;
 
-// 定义用于接收按键键码的变量
 uint8_t KeyNum;
-// 按下次数记录
-uint8_t PressNum = 0;
-// 定义用于接收串口数据的变量
-uint8_t RxData;
+
+// 发送成功计次，发送失败计次
+uint8_t SendSuccessCount, SendFailedCount;
+// 接收成功计次，接收失败计次
+uint8_t ReceiveSuccessCount, ReceiveFailedCount;
 
 int main(void)
 {	
-	// OLED初始化
-	OLED_Init();
 	// 板级支持包中的硬件驱动初始化
-	BSP_Init();
-	// 按键初始化
+	// BSP_Init();
+	// 串口初始化，波特率：115200，8位数据，1位停止位，禁用奇偶校验
+	Uart1_Init(115200);
+	// NVIC初始化
+	My_NVIC_Init();
+	// NRF24L01初始化
+	NRF24L01_Init();
 	Key_Init();
 	
-	/* 显示静态字符串 */
-	OLED_ShowString(1, 1, "Rx:");
-	OLED_ShowString(2, 1, "Tx:");
-	OLED_ShowString(3, 1, "Press:");
+	/* 初始化测试数据，此处值为任意设定，便于观察实验现象 */
+	NRF24L01_TxPacket[0] = 0x00;
+	NRF24L01_TxPacket[1] = 0x01;
+	NRF24L01_TxPacket[2] = 0x02;
+	NRF24L01_TxPacket[3] = 0x03;
+	
+	// 显示格式为：T:发送成功计次-发送失败计次-发送标志位
+	// 显示格式为：R:接收成功计次-接收失败计次-接收标志位
 	
 	while (1)
-	{
-		// 获取按键键码
+	{	
+		// 读取按键，获取键码
 		KeyNum = Key_GetNum();
 		
-		// 串口接收
-		// 检查串口接收数据的标志位
-		if (Serial_GetRxFlag() == 1)
-		{
-			// 获取串口接收的数据
-			RxData = Serial_GetRxData();
-			// 显示串口接收的数据
-			OLED_ShowHexNum(1, 4, RxData, 2);
-		}
-		
-		// 串口发送
+		// 按键按下
 		if (KeyNum == 1)
 		{
-			PressNum++;
-			// 显示按键次数
-			OLED_ShowNum(3, 7, PressNum, 2);
-			// 根据按下次数的不同，测试自定义串口函数
-			switch (PressNum)
+			/* 变换测试数据，便于观察实验现象 */
+			// 实际项目中，可以将待发送的数据赋值给NRF24L01_TxPacket数组
+			NRF24L01_TxPacket[0]++;
+			NRF24L01_TxPacket[1]++;
+			NRF24L01_TxPacket[2]++;
+			NRF24L01_TxPacket[3]++;
+			
+			/* 调用NRF24L01_Send函数，发送数据，
+			同时置发送标志位，方便用户了解发送状态 */
+			// 发送标志位与发送状态的对应关系，可以转到此函数定义上方查看
+			NRF24L01_Send();
+			Delay_ms(10);
+			// 判断发送标志位
+			if (NRF24L01_SendFlag == 1)
 			{
-				case 1:
-					// 串口以HEX的形式输出U8（无符号8位整数）型数据
-					PrintHexU8(0x11);
-					// 显示串口发送的数据
-					OLED_ShowHexNum(2, 4, 0x11, 2);
-				break;
-				case 2:
-					// 串口以HEX的形式输出S16（有符号16位整数）型数据
-					PrintHexS16(0x2222);
-					// 显示串口发送的数据
-					OLED_ShowHexNum(2, 4, 0x2222, 4);
-				break;
-				case 3:
-					// 串口以字符的形式输出S8（有符号8位整数）型数据
-					PrintS8(100);
-					// 显示串口发送的数据
-					OLED_ShowNum(2, 4, 100, 3);
-				break;
-				case 4:
-					// 串口以字符的形式输出U8（无符号8位整数）型数据
-					PrintU8(200);
-					// 显示串口发送的数据
-					OLED_ShowNum(2, 4, 200, 3);
-				break;
-				case 5:
-					// 串口以字符的形式输出S16（有符号16位整数）型数据
-					PrintS16(30000);
-					// 显示串口发送的数据
-					OLED_ShowNum(2, 4, 30000, 5);
-				break;
-				case 6:
-					// 串口以字符的形式输出U16型数据
-					PrintU16(60000);
-					// 显示串口发送的数据
-					OLED_ShowNum(2, 4, 60000, 5);
-				break;
-				case 7:
-					// 串口输出字符串
-					PrintString("aaa");
-					// 显示串口发送的数据
-					OLED_ShowString(2, 4, "aaa");
-				break;
-				default:
-					break;
+				// 发送标志位为1，表示发送成功
+				// 发送成功计次变量自增
+				SendSuccessCount++;
 			}
+			else
+			{
+				// 发送标志位不为1，即2/3/4，表示发送不成功
+				// 发送失败计次变量自增
+				SendFailedCount++;
+			}
+			
+			Serial_SendString("\r\n");
+			Serial_SendString("T:");
+			// 显示发送成功次数
+			Serial_SendNumber(SendSuccessCount, 3);
+			Serial_SendString("-");
+			// 显示发送失败次数
+			Serial_SendNumber(SendFailedCount, 3);
+			Serial_SendString("-");
+			// 显示最近一次的发送标志位
+			Serial_SendNumber(NRF24L01_SendFlag, 1);
+			
+			/* 显示发送数据 */
+			Serial_SendString("\r\n");
+			Serial_SendHexAsText(NRF24L01_TxPacket[0]);
+			Serial_SendString(" ");
+			Serial_SendHexAsText(NRF24L01_TxPacket[1]);
+			Serial_SendString(" ");
+			Serial_SendHexAsText(NRF24L01_TxPacket[2]);
+			Serial_SendString(" ");
+			Serial_SendHexAsText(NRF24L01_TxPacket[3]);
+			
+			/* TX字符串闪烁一次，表明发送了一次数据 */
+			Serial_SendString("\r\nTX");
+		}
+		
+		/* 主循环内循环执行NRF24L01_Receive函数，接收数据，
+		同时返回接收标志位，方便用户了解接收状态*/
+		// 接收标志位与接收状态的对应关系，可以转到此函数定义上方查看
+		// 判断接收标志位
+		if (NRF24L01_ReceiveFlag)
+		{
+			// 接收标志位不为0，表示收到了一个数据包
+			if (NRF24L01_ReceiveFlag == 1)
+			{
+				// 接收标志位为1，表示接收成功
+				// 接收成功计次变量自增
+				ReceiveSuccessCount++;
+			}
+			else
+			{
+				// 接收标志位不为0也不为1，即2/3，表示此次接收产生了错误，
+				// 错误接收的数据不应该使用
+				// 接收失败计次变量自增
+				ReceiveFailedCount++;
+			}
+			
+			Serial_SendString("\r\n");
+			Serial_SendString("R:");
+			// 显示接收成功次数
+			Serial_SendNumber(ReceiveSuccessCount, 3);
+			Serial_SendString("-");
+			// 显示接收失败次数
+			Serial_SendNumber(ReceiveFailedCount, 3);
+			Serial_SendString("-");
+			// 显示最近一次的接收标志位
+			Serial_SendNumber(NRF24L01_ReceiveFlag, 1);
+			
+			/* 显示接收数据 */
+			Serial_SendString("\r\n");
+			Serial_SendHexAsText(NRF24L01_RxPacket[0]);
+			Serial_SendString(" ");
+			Serial_SendHexAsText(NRF24L01_RxPacket[1]);
+			Serial_SendString(" ");
+			Serial_SendHexAsText(NRF24L01_RxPacket[2]);
+			Serial_SendString(" ");
+			Serial_SendHexAsText(NRF24L01_RxPacket[3]);
+			
+			// RX字符串闪烁一次，表明接收到了一次数据
+			Serial_SendString("\r\nRX");
+			
+			// 接收标志位置0，恢复初始值
+			NRF24L01_ReceiveFlag = 0;
 		}
 		
 		/**

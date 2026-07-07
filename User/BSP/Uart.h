@@ -3,13 +3,11 @@
 #include "stm32f10x.h"                  // Device header
 
 void Uart1_Init(uint32_t baud);
-void PrintHexU8(uint8_t data);
-void PrintHexS16(int16_t num);
-void PrintS8(int8_t num);
-void PrintU8(uint8_t num);
-void PrintS16(int16_t num);
-void PrintU16(uint16_t num);
-void PrintString(char *s);
+void Serial_SendByte(uint8_t Byte);
+void Serial_SendArray(uint8_t *Array, uint16_t Length);
+void Serial_SendString(char *String);
+void Serial_SendNumber(uint32_t Number, uint8_t Length);
+void Serial_SendHexAsText(uint8_t Data);
 uint8_t Serial_GetRxFlag(void);
 uint8_t Serial_GetRxData(void);
 

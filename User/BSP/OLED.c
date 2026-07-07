@@ -6,7 +6,7 @@
 #define OLED_W_SDA(x)		GPIO_WriteBit(GPIOB, GPIO_Pin_9, (BitAction)(x))
 
 /*引脚初始化*/
-void OLED_I2C_Init(void)
+static void OLED_I2C_Init(void)
 {
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
 	
@@ -27,7 +27,7 @@ void OLED_I2C_Init(void)
   * @param  无
   * @retval 无
   */
-void OLED_I2C_Start(void)
+static void OLED_I2C_Start(void)
 {
 	OLED_W_SDA(1);
 	OLED_W_SCL(1);
@@ -40,7 +40,7 @@ void OLED_I2C_Start(void)
   * @param  无
   * @retval 无
   */
-void OLED_I2C_Stop(void)
+static void OLED_I2C_Stop(void)
 {
 	OLED_W_SDA(0);
 	OLED_W_SCL(1);
@@ -52,7 +52,7 @@ void OLED_I2C_Stop(void)
   * @param  Byte 要发送的一个字节
   * @retval 无
   */
-void OLED_I2C_SendByte(uint8_t Byte)
+static void OLED_I2C_SendByte(uint8_t Byte)
 {
 	uint8_t i;
 	for (i = 0; i < 8; i++)
@@ -70,7 +70,7 @@ void OLED_I2C_SendByte(uint8_t Byte)
   * @param  Command 要写入的命令
   * @retval 无
   */
-void OLED_WriteCommand(uint8_t Command)
+static void OLED_WriteCommand(uint8_t Command)
 {
 	OLED_I2C_Start();
 	OLED_I2C_SendByte(0x78);		//从机地址
@@ -84,7 +84,7 @@ void OLED_WriteCommand(uint8_t Command)
   * @param  Data 要写入的数据
   * @retval 无
   */
-void OLED_WriteData(uint8_t Data)
+static void OLED_WriteData(uint8_t Data)
 {
 	OLED_I2C_Start();
 	OLED_I2C_SendByte(0x78);		//从机地址
@@ -99,7 +99,7 @@ void OLED_WriteData(uint8_t Data)
   * @param  X 以左上角为原点，向右方向的坐标，范围：0~127
   * @retval 无
   */
-void OLED_SetCursor(uint8_t Y, uint8_t X)
+static void OLED_SetCursor(uint8_t Y, uint8_t X)
 {
 	OLED_WriteCommand(0xB0 | Y);					//设置Y位置
 	OLED_WriteCommand(0x10 | ((X & 0xF0) >> 4));	//设置X位置高4位
@@ -166,7 +166,7 @@ void OLED_ShowString(uint8_t Line, uint8_t Column, char *String)
   * @brief  OLED次方函数
   * @retval 返回值等于X的Y次方
   */
-uint32_t OLED_Pow(uint32_t X, uint32_t Y)
+static uint32_t OLED_Pow(uint32_t X, uint32_t Y)
 {
 	uint32_t Result = 1;
 	while (Y--)

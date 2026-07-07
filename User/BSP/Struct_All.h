@@ -9,5 +9,6 @@
 #include "LED.h"
 #include "Key.h"
 #include "Buzzer.h"
+#include "NRF24L01.h"
 
 #endif
