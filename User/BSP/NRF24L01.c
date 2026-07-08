@@ -1,6 +1,5 @@
 #include "NRF24L01.h"
 #include "MySPI.h"
-#include "Uart.h"
 
 /* 发送部分 */
 // 发送地址，固定5字节

@@ -67,6 +67,8 @@ void BSP_Init(void)
 	Buzzer_Init();
 	// LED闪烁
 	LED_ON_OFF();
+	// 按键初始化
+	Key_Init();
 	// 串口初始化，波特率：115200，8位数据，1位停止位，禁用奇偶校验
 	Uart1_Init(115200);
 	// Timer3初始化，频率为：500HZ

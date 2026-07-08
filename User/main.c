@@ -13,14 +13,7 @@ uint8_t ReceiveSuccessCount, ReceiveFailedCount;
 int main(void)
 {	
 	// 板级支持包中的硬件驱动初始化
-	// BSP_Init();
-	// 串口初始化，波特率：115200，8位数据，1位停止位，禁用奇偶校验
-	Uart1_Init(115200);
-	// NVIC初始化
-	My_NVIC_Init();
-	// NRF24L01初始化
-	NRF24L01_Init();
-	Key_Init();
+	BSP_Init();
 	
 	/* 初始化测试数据，此处值为任意设定，便于观察实验现象 */
 	NRF24L01_TxPacket[0] = 0x00;
@@ -50,19 +43,29 @@ int main(void)
 			同时置发送标志位，方便用户了解发送状态 */
 			// 发送标志位与发送状态的对应关系，可以转到此函数定义上方查看
 			NRF24L01_Send();
-			Delay_ms(10);
+			
 			// 判断发送标志位
-			if (NRF24L01_SendFlag == 1)
+			while (1)
 			{
-				// 发送标志位为1，表示发送成功
-				// 发送成功计次变量自增
-				SendSuccessCount++;
-			}
-			else
-			{
-				// 发送标志位不为1，即2/3/4，表示发送不成功
-				// 发送失败计次变量自增
-				SendFailedCount++;
+				if (NRF24L01_SendFlag)
+				{
+					if (NRF24L01_SendFlag == 1)
+					{
+						// 发送标志位为1，表示发送成功
+						// 发送成功计次变量自增
+						SendSuccessCount++;
+						// 跳出循环
+						break;
+					}
+					else
+					{
+						// 发送标志位不为1，即2/3/4，表示发送不成功
+						// 发送失败计次变量自增
+						SendFailedCount++;
+						// 跳出循环
+						break;
+					}
+				}
 			}
 			
 			Serial_SendString("\r\n");
@@ -88,6 +91,9 @@ int main(void)
 			
 			/* TX字符串闪烁一次，表明发送了一次数据 */
 			Serial_SendString("\r\nTX");
+			
+			// 发送标志位置0，恢复初始值
+			NRF24L01_SendFlag = 0;
 		}
 		
 		/* 主循环内循环执行NRF24L01_Receive函数，接收数据，
