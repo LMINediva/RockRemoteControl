@@ -79,6 +79,9 @@ void BSP_Init(void)
 	ADC1_Init();
 	// NRF24L01初始化
 	NRF24L01_Init();
+	// 参数存储模块初始化，在上电的时候将闪存的数据加载回Store_Data，
+	// 实现掉电不丢失
+	Store_Init();
 	
 	BSP_Init_OK = 1;
 }

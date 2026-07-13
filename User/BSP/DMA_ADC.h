@@ -7,5 +7,6 @@
 extern uint16_t ADC_Value[M];
 
 void ADC1_Init(void);
+uint16_t Get_Filtered_ADC(uint16_t Value);
 
 #endif

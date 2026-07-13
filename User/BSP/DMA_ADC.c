@@ -158,3 +158,19 @@ void ADC1_Init(void)
 	ADC1_GPIO_Config();
 	ADC1_Mode_Config();
 }
+
+/**
+ * 函数：简单均值滤波
+ * 参数：无
+ * 返回值：无
+ */
+uint16_t Get_Filtered_ADC(uint16_t Value)
+{
+    uint32_t sum = 0;
+	uint8_t i;
+    for(i = 0; i < 10; i++) 
+	{ 
+		sum += Value;
+	}
+    return sum / 10;
+}
